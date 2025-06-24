@@ -84,6 +84,30 @@ public class UserServiceTests
         .Which.Should().BeEquivalentTo(inactiveUser);
     }
 
+    [Fact]
+    public void Create_WhenCreateCalled_ShouldUseUserDetails()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var service = CreateService();
+        var userToCreate = new User
+        {
+            Forename = "Johnny",
+            Surname = "User",
+            Email = "juser@example.com",
+            IsActive = true
+        };
+
+        // Act: Invokes the method under test with the arranged parameters.
+        service.Create(userToCreate);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        _dataContext.Verify(s => s.Create(It.Is<User>(u =>
+            u.Forename == userToCreate.Forename &&
+            u.Surname == userToCreate.Surname &&
+            u.Email == userToCreate.Email &&
+            u.IsActive == userToCreate.IsActive)), Times.Once);
+    }
+
     private IQueryable<User> SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true)
     {
         var users = new[]
