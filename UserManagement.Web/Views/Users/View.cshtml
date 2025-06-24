@@ -1,0 +1,8 @@
+@model UserManagement.Web.Models.Users.UserListItemViewModel
+
+<h2>@Model.Forename @Model.Surname</h2>
+<p>Id: @Model.Id</p>
+<p>Email: @Model.Email</p>
+<p>Active: @(Model.IsActive ? "Yes" : "No")</p>
+
+<a href="/users">Back</a>

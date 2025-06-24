@@ -65,4 +65,27 @@ public class UsersController : Controller
         _userService.Create(user);
         return RedirectToAction("List");
     }
+
+    [HttpGet("{id:long}")]
+    public ViewResult View(long id)
+    {
+
+        var user = _userService.GetById(id);
+
+        if (user == null)
+        {
+            return View("Error");
+        }
+
+        var model = new UserListItemViewModel
+        {
+            Id = user.Id,
+            Forename = user.Forename,
+            Surname = user.Surname,
+            Email = user.Email,
+            IsActive = user.IsActive
+        };
+
+        return View(model);
+    }
 }
