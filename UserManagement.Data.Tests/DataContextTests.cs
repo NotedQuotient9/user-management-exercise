@@ -1,5 +1,4 @@
 using System.Linq;
-using FluentAssertions;
 using UserManagement.Models;
 
 namespace UserManagement.Data.Tests;
@@ -42,6 +41,33 @@ public class DataContextTests
 
         // Assert: Verifies that the action of the method under test behaves as expected.
         result.Should().NotContain(s => s.Email == entity.Email);
+    }
+
+    [Fact]
+    public void GetAll_WhenFilteredByIsActive_MustOnlyReturnActiveUsers()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var context = CreateContext();
+
+        // Act: Invokes the method under test with the arranged parameters.
+        var result = context.GetAll<User>().Where(u => u.IsActive == true);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        result.All(u => u.IsActive).Should().BeTrue();
+    }
+
+    [Fact]
+    public void GetAll_WhenFilteredByIsActive_MustOnlyReturnInactiveUsers()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var context = CreateContext();
+
+
+        // Act: Invokes the method under test with the arranged parameters.
+        var result = context.GetAll<User>().Where(u => u.IsActive == false);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        result.All(u => u.IsActive).Should().BeFalse();
     }
 
     private DataContext CreateContext() => new();

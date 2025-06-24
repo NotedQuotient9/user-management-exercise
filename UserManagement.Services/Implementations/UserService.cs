@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using System.Collections.Generic;
 using UserManagement.Data;
 using UserManagement.Models;
@@ -18,7 +18,7 @@ public class UserService : IUserService
     /// <returns></returns>
     public IEnumerable<User> FilterByActive(bool isActive)
     {
-        throw new NotImplementedException();
+        return _dataAccess.GetAll<User>().Where(u => u.IsActive == isActive);
     }
 
     public IEnumerable<User> GetAll() => _dataAccess.GetAll<User>();
