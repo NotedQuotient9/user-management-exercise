@@ -20,7 +20,7 @@ public class UserServiceTests
         result.Should().BeSameAs(users);
     }
 
-        [Fact]
+    [Fact]
     public void FilterByActive_WhenContextReturnsEntities_MustReturnOnlyActiveUsers()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
