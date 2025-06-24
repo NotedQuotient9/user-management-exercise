@@ -25,4 +25,4 @@ jobs:
     - name: Build
       run: (cd UserManagement.Web && dotnet build --no-restore)
     - name: Test
-      run: (cd UserManagement.Web.Tests && dotnet test --no-build --verbosity normal)
+      run: dotnet test --no-build --verbosity normal
