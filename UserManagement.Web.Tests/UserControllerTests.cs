@@ -15,9 +15,49 @@ public class UserControllerTests
         var users = SetupUsers();
 
         // Act: Invokes the method under test with the arranged parameters.
-        var result = controller.List();
+        var result = controller.List(null);
 
         // Assert: Verifies that the action of the method under test behaves as expected.
+        result.Model
+            .Should().BeOfType<UserListViewModel>()
+            .Which.Items.Should().BeEquivalentTo(users);
+    }
+
+    [Fact]
+    public void List_WhenSerivceReturnsUsersWithIsActiveTrue_ModelMustContainOnlyActiveUsers()
+    {
+        // Arrange
+        var controller = CreateController();
+        var users = SetupUsers(isActive: true);
+
+        _userService
+            .Setup(s => s.FilterByActive(true))
+            .Returns(users);
+
+        // Act
+        var result = controller.List(true);
+
+        // Assert
+        result.Model
+            .Should().BeOfType<UserListViewModel>()
+            .Which.Items.Should().BeEquivalentTo(users);
+    }
+
+   [Fact]
+    public void List_WhenSerivceReturnsUsersWithIsActiveFalse_ModelMustContainOnlyInactiveUsers()
+    {
+        // Arrange
+        var controller = CreateController();
+        var users = SetupUsers(isActive: false);
+
+        _userService
+            .Setup(s => s.FilterByActive(false))
+            .Returns(users);
+
+        // Act
+        var result = controller.List(false);
+
+        // Assert
         result.Model
             .Should().BeOfType<UserListViewModel>()
             .Which.Items.Should().BeEquivalentTo(users);
