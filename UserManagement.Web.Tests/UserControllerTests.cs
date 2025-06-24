@@ -43,7 +43,7 @@ public class UserControllerTests
             .Which.Items.Should().BeEquivalentTo(users);
     }
 
-   [Fact]
+    [Fact]
     public void List_WhenSerivceReturnsUsersWithIsActiveFalse_ModelMustContainOnlyInactiveUsers()
     {
         // Arrange
@@ -61,6 +61,73 @@ public class UserControllerTests
         result.Model
             .Should().BeOfType<UserListViewModel>()
             .Which.Items.Should().BeEquivalentTo(users);
+    }
+
+    [Fact]
+    public void Create_WhenModelStateIsValid_CallsServiceToCreateUser()
+    {
+        // Arrange
+        var controller = CreateController();
+        var model = new UserCreateViewModel
+        {
+            Forename = "John",
+            Surname = "Doe",
+            Email = "test@email.com",
+            IsActive = true
+        };
+
+        // Act
+        controller.Create(model);
+
+        // Assert
+        _userService.Verify(s => s.Create(It.Is<User>(u =>
+            u.Forename == model.Forename &&
+            u.Surname == model.Surname &&
+            u.Email == model.Email &&
+            u.IsActive == model.IsActive)), Times.Once);
+    }
+
+    [Fact]
+    public void Create_WhenModelStateIsInvalid_DoesNotCallServiceToCreateUser()
+    {
+        // Arrange
+        var controller = CreateController();
+        var model = new UserCreateViewModel
+        {
+            Forename = "John",
+            Surname = "Doe",
+            Email = "test@email.com",
+            IsActive = true
+        };
+        controller.ModelState.AddModelError("Forename", "Required");
+
+        // Act
+        controller.Create(model);
+
+        // Assert
+        _userService.Verify(s => s.Create(It.IsAny<User>()), Times.Never);
+    }
+
+    [Fact]
+    public void Create_WhenEmailIsTaken_DoesNotCallServiceToCreateUser()
+    {
+        // Arrange
+        var controller = CreateController();
+        var users = SetupUsers(email: "test@email.com");
+
+        var model = new UserCreateViewModel
+        {
+            Forename = "John",
+            Surname = "Doe",
+            Email = "test@email.com",
+            IsActive = true
+        };
+
+        // Act
+        controller.Create(model);
+
+        // Assert
+        _userService.Verify(s => s.Create(It.IsAny<User>()), Times.Never);
     }
 
     private User[] SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true)

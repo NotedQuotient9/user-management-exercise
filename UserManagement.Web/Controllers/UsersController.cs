@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using UserManagement.Services.Domain.Interfaces;
 using UserManagement.Web.Models.Users;
+using UserManagement.Models;
 
 namespace UserManagement.WebMS.Controllers;
 
@@ -33,5 +34,35 @@ public class UsersController : Controller
         };
 
         return View(model);
+    }
+
+    [HttpGet("create")]
+    public IActionResult Create()
+    {
+        return View();
+    }
+
+    [HttpPost("create")]
+    public IActionResult Create(UserCreateViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+        if (_userService.GetAll().Any(u => u.Email == model.Email))
+        {
+            ModelState.AddModelError("Email", "Email already exists.");
+            return View(model);
+        }
+
+        var user = new User
+        {
+            Forename = model.Forename,
+            Surname = model.Surname,
+            Email = model.Email,
+            IsActive = model.IsActive
+        };
+        _userService.Create(user);
+        return RedirectToAction("List");
     }
 }

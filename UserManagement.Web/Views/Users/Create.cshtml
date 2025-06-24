@@ -1,0 +1,26 @@
+@model UserManagement.Web.Models.Users.UserCreateViewModel
+
+<h2>Add User</h2>
+<form asp-action="Create" method="post">
+    <div>
+        <label asp-for="Forename" class="form-label"></label>
+        <input asp-for="Forename" class="form-control" />
+        <span asp-validation-for="Forename" class="text-danger"></span>
+    </div>
+    <div>
+        <label asp-for="Surname" class="form-label"></label>
+        <input asp-for="Surname" class="form-control" />
+        <span asp-validation-for="Surname" class="text-danger"></span>
+    </div>
+    <div>
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div>
+        <label asp-for="IsActive" class="form-label"></label>
+        <input asp-for="IsActive" type="checkbox" class="form-check-input" />
+        <span asp-validation-for="IsActive" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Add</button>
+</form>
