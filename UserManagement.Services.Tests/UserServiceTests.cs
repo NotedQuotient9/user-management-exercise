@@ -108,6 +108,47 @@ public class UserServiceTests
             u.IsActive == userToCreate.IsActive)), Times.Once);
     }
 
+    [Fact]
+    public void GetById_IfUserExists_ShouldReturnUserDetails()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var service = CreateService();
+        var user = new User
+        {
+            Forename = "Johnny",
+            Surname = "User",
+            Email = "juser@example.com",
+            IsActive = true
+        };
+        _dataContext
+            .Setup(s => s.GetById<User>(It.IsAny<long>()))
+            .Returns(user);
+
+        // Act: Invokes the method under test with the arranged parameters.
+        var result = service.GetById(1);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        result.Should().BeSameAs(user);
+
+    }
+
+    [Fact]
+    public void GetById_IfUserDoesNotExist_ShouldReturnNull()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var service = CreateService();
+        _dataContext
+            .Setup(s => s.GetById<User>(It.IsAny<long>()))
+            .Returns(value: null);
+
+        // Act: Invokes the method under test with the arranged parameters.
+        var result = service.GetById(1);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        result.Should().BeNull();
+
+    }
+
     private IQueryable<User> SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true)
     {
         var users = new[]

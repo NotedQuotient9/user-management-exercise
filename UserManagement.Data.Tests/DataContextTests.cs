@@ -70,5 +70,35 @@ public class DataContextTests
         result.All(u => u.IsActive).Should().BeFalse();
     }
 
+    [Fact]
+    public void GetById_WhenUserExists_ShouldReturnUser()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var context = CreateContext();
+        var expected = new User { Id = 1000, Forename = "New", Surname = "User", Email = "newUser@example.com", IsActive = true };
+        context.Create(expected);
+
+        // Act: Invokes the method under test with the arranged parameters.
+        var result = context.GetById<User>(1000);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        result
+            .Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public void GetById_WhenUserDoesNotExist_ShouldReturnNull()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var context = CreateContext();
+
+        // Act: Invokes the method under test with the arranged parameters.
+        var result = context.GetById<User>(100);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        result
+            .Should().BeNull();
+    }
+
     private DataContext CreateContext() => new();
 }

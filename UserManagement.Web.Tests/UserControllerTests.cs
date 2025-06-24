@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
 using UserManagement.Web.Models.Users;
@@ -24,7 +25,7 @@ public class UserControllerTests
     }
 
     [Fact]
-    public void List_WhenSerivceReturnsUsersWithIsActiveTrue_ModelMustContainOnlyActiveUsers()
+    public void List_WhenServiceReturnsUsersWithIsActiveTrue_ModelMustContainOnlyActiveUsers()
     {
         // Arrange
         var controller = CreateController();
@@ -44,7 +45,7 @@ public class UserControllerTests
     }
 
     [Fact]
-    public void List_WhenSerivceReturnsUsersWithIsActiveFalse_ModelMustContainOnlyInactiveUsers()
+    public void List_WhenServiceReturnsUsersWithIsActiveFalse_ModelMustContainOnlyInactiveUsers()
     {
         // Arrange
         var controller = CreateController();
@@ -128,6 +129,52 @@ public class UserControllerTests
 
         // Assert
         _userService.Verify(s => s.Create(It.IsAny<User>()), Times.Never);
+    }
+
+    [Fact]
+    public void View_WhenServiceReturnsUser_ModelMustContainUser()
+    {
+        // Arrange
+        var controller = CreateController();
+        var expected = new User
+        {
+            Id = 1,
+            Forename = "John",
+            Surname = "Doe",
+            Email = "test@email.com",
+            IsActive = true
+        };
+
+        _userService
+            .Setup(s => s.GetById(1))
+            .Returns(expected);
+
+        // Act
+        var result = controller.View(1);
+
+        // Assert
+        result.Model
+            .Should().BeOfType<UserListItemViewModel>()
+            .Which.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public void View_WhenServiceReturnsNull_ShouldReturnErrorView()
+    {
+        // Arrange
+        var controller = CreateController();
+
+        _userService
+            .Setup(s => s.GetById(1))
+            .Returns(value: null);
+
+        // Act
+        var result = controller.View(1);
+
+        // Assert
+        result
+            .Should().BeOfType<ViewResult>()
+            .Which.ViewName.Should().Be("Error");
     }
 
     private User[] SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true)
