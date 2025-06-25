@@ -88,4 +88,48 @@ public class UsersController : Controller
 
         return View(model);
     }
+
+    [HttpGet("edit/{id:long}")]
+    public IActionResult Edit(long id)
+    {
+        var user = _userService.GetById(id);
+        if (user == null)
+        {
+            return View("Error");
+        }
+
+        var model = new UserEditViewModel
+        {
+            Id = user.Id,
+            Forename = user.Forename,
+            Surname = user.Surname,
+            Email = user.Email,
+            IsActive = user.IsActive
+        };
+        return View(model);
+    }
+
+    [HttpPost("edit/{id:long}")]
+    public IActionResult Edit(long id, UserEditViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var user = _userService.GetById(id);
+        if (user == null)
+        {
+            return View("Error");
+        }
+
+        user.Forename = model.Forename;
+        user.Surname = model.Surname;
+        user.Email = model.Email;
+        user.IsActive = model.IsActive;
+
+        _userService.Update(user);
+
+        return RedirectToAction("List");
+    }
 }
