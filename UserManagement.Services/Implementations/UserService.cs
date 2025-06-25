@@ -23,4 +23,6 @@ public class UserService : IUserService
     public User? GetById(long id) => _dataAccess.GetById<User>(id);
 
     public void Update(User user) => _dataAccess.Update(user);
+
+    public void Delete(User user) => _dataAccess.Delete<User>(user);
 }

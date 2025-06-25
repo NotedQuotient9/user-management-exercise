@@ -195,6 +195,31 @@ public class UserServiceTests
             u.Id == userToUpdate.Id)), Times.Once);
     }
 
+    [Fact]
+    public void Delete_WhenDeleteCalled_ShouldUseUserDetails()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var service = CreateService();
+        var userToDelete = new User
+        {
+            Forename = "Johnny",
+            Surname = "User",
+            Email = "juser@example.com",
+            IsActive = true,
+            Id = 1
+        };
+
+        // Act: Invokes the method under test with the arranged parameters.
+        service.Delete(userToDelete);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        _dataContext.Verify(s => s.Delete(It.Is<User>(u =>
+            u.Forename == userToDelete.Forename &&
+            u.Surname == userToDelete.Surname &&
+            u.Email == userToDelete.Email &&
+            u.IsActive == userToDelete.IsActive &&
+            u.Id == userToDelete.Id)), Times.Once);
+    }
 
     private readonly Mock<IDataContext> _dataContext = new();
     private UserService CreateService() => new(_dataContext.Object);
