@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Implementations;
@@ -30,6 +31,7 @@ public class UserServiceTests
             Forename = "Johnny",
             Surname = "User",
             Email = "juser@example.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = true
         };
         var inactiveUser = new User
@@ -37,6 +39,7 @@ public class UserServiceTests
             Forename = "Jane",
             Surname = "User",
             Email = "test@email.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = false
         };
         var users = new[] { activeUser, inactiveUser }.AsQueryable();
@@ -62,6 +65,7 @@ public class UserServiceTests
             Forename = "Johnny",
             Surname = "User",
             Email = "juser@example.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = true
         };
         var inactiveUser = new User
@@ -69,6 +73,7 @@ public class UserServiceTests
             Forename = "Jane",
             Surname = "User",
             Email = "test@email.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = false
         };
         var users = new[] { activeUser, inactiveUser }.AsQueryable();
@@ -94,6 +99,7 @@ public class UserServiceTests
             Forename = "Johnny",
             Surname = "User",
             Email = "juser@example.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = true
         };
 
@@ -118,6 +124,7 @@ public class UserServiceTests
             Forename = "Johnny",
             Surname = "User",
             Email = "juser@example.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = true
         };
         _dataContext
@@ -149,26 +156,6 @@ public class UserServiceTests
 
     }
 
-    private IQueryable<User> SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true)
-    {
-        var users = new[]
-        {
-            new User
-            {
-                Forename = forename,
-                Surname = surname,
-                Email = email,
-                IsActive = isActive
-            }
-        }.AsQueryable();
-
-        _dataContext
-            .Setup(s => s.GetAll<User>())
-            .Returns(users);
-
-        return users;
-    }
-
     [Fact]
     public void Update_WhenUpdateCalled_ShouldUseUserDetails()
     {
@@ -195,6 +182,26 @@ public class UserServiceTests
             u.Id == userToUpdate.Id)), Times.Once);
     }
 
+    private IQueryable<User> SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true, DateTime dateofBirth = default)
+    {
+        var users = new[]
+        {
+            new User
+            {
+                Forename = forename,
+                Surname = surname,
+                Email = email,
+                IsActive = isActive,
+                DateOfBirth = dateofBirth
+            }
+        }.AsQueryable();
+
+        _dataContext
+            .Setup(s => s.GetAll<User>())
+            .Returns(users);
+
+        return users;
+    }
 
     private readonly Mock<IDataContext> _dataContext = new();
     private UserService CreateService() => new(_dataContext.Object);

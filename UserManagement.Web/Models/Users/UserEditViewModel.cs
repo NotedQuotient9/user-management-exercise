@@ -1,3 +1,5 @@
+using System;
+
 namespace UserManagement.Web.Models.Users;
 
 public class UserEditViewModel
@@ -7,4 +9,6 @@ public class UserEditViewModel
     public required string Email { get; set; }
     public required bool IsActive { get; set; }
     public required long Id { get; set; }
+    public DateTime DateOfBirth { get; set; }
+
 }

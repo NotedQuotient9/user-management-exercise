@@ -11,4 +11,5 @@ public class User
     public string Surname { get; set; } = default!;
     public string Email { get; set; } = default!;
     public bool IsActive { get; set; }
+    public System.DateTime DateOfBirth { get; set; }
 }
