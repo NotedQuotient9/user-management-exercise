@@ -169,6 +169,33 @@ public class UserServiceTests
         return users;
     }
 
+    [Fact]
+    public void Update_WhenUpdateCalled_ShouldUseUserDetails()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var service = CreateService();
+        var userToUpdate = new User
+        {
+            Forename = "Johnny",
+            Surname = "User",
+            Email = "juser@example.com",
+            IsActive = true,
+            Id = 1
+        };
+
+        // Act: Invokes the method under test with the arranged parameters.
+        service.Update(userToUpdate);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        _dataContext.Verify(s => s.Update(It.Is<User>(u =>
+            u.Forename == userToUpdate.Forename &&
+            u.Surname == userToUpdate.Surname &&
+            u.Email == userToUpdate.Email &&
+            u.IsActive == userToUpdate.IsActive &&
+            u.Id == userToUpdate.Id)), Times.Once);
+    }
+
+
     private readonly Mock<IDataContext> _dataContext = new();
     private UserService CreateService() => new(_dataContext.Object);
 }

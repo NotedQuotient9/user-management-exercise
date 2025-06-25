@@ -1,7 +1,9 @@
-@model UserManagement.Web.Models.Users.UserCreateViewModel
+@model UserManagement.Web.Models.Users.UserEditViewModel
 
-<h2>Add User</h2>
-<form asp-action="Create" method="post">
+<h2>Edit User</h2>
+<p>Id: @Model.Id</p>
+
+<form asp-action="Edit" method="post">
     <div>
         <label asp-for="Forename" class="form-label"></label>
         <input asp-for="Forename" class="form-control" />
@@ -22,7 +24,7 @@
         <input asp-for="IsActive" type="checkbox" class="form-check-input" />
         <span asp-validation-for="IsActive" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-primary">Add</button>
+    <button type="submit" class="btn btn-primary">Update</button>
 </form>
 
 <a href="/users">Back</a>

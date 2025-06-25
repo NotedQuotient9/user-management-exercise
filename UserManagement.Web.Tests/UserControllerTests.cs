@@ -177,6 +177,99 @@ public class UserControllerTests
             .Which.ViewName.Should().Be("Error");
     }
 
+    [Fact]
+    public void Edit_WhenModelStateIsValid_CallsServiceToUpdateUser()
+    {
+        // Arrange
+        var controller = CreateController();
+        SetupUsers();
+        var model = new UserEditViewModel
+        {
+            Forename = "John",
+            Surname = "Doe",
+            Email = "test@email.com",
+            IsActive = true,
+            Id = 1
+        };
+        var user = new User
+        {
+            Id = 1,
+            Forename = "John",
+            Surname = "Doe",
+            Email = "test@email.com",
+            IsActive = true
+        };
+        _userService
+            .Setup(s => s.GetById(1))
+            .Returns(user);
+
+
+        // Act
+        controller.Edit(1, model);
+
+        // Assert
+        _userService.Verify(s => s.Update(It.Is<User>(u =>
+            u.Forename == model.Forename &&
+            u.Surname == model.Surname &&
+            u.Email == model.Email &&
+            u.IsActive == model.IsActive &&
+            u.Id == model.Id)), Times.Once);
+    }
+
+    [Fact]
+    public void Edit_WhenModelStateIsInvalid_DoesNotCallServiceToUpdateUser()
+    {
+        // Arrange
+        var controller = CreateController();
+        var model = new UserEditViewModel
+        {
+            Forename = "John",
+            Surname = "Doe",
+            Email = "test@email.com",
+            IsActive = true,
+            Id = 1
+        };
+        controller.ModelState.AddModelError("Forename", "Required");
+
+        // Act
+        controller.Edit(1, model);
+
+        // Assert
+        _userService.Verify(s => s.Create(It.IsAny<User>()), Times.Never);
+
+    }
+
+    [Fact]
+    public void Edit_WhenServiceReturnsNull_ShouldReturnErrorView()
+    {
+
+        // Arrange
+        var controller = CreateController();
+        _userService
+            .Setup(s => s.GetById(1))
+            .Returns(value: null);
+        var model = new UserEditViewModel
+        {
+            Forename = "John",
+            Surname = "Doe",
+            Email = "test@email.com",
+            IsActive = true,
+            Id = 1
+        };
+
+        // Act
+        controller.Edit(1, model);
+
+        // Act
+        var result = controller.View(1);
+
+        // Assert
+        result
+            .Should().BeOfType<ViewResult>()
+            .Which.ViewName.Should().Be("Error");
+    }
+
+
     private User[] SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true)
     {
         var users = new[]
