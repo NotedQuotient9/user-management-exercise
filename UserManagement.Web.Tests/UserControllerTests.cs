@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
@@ -74,6 +75,7 @@ public class UserControllerTests
             Forename = "John",
             Surname = "Doe",
             Email = "test@email.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = true
         };
 
@@ -98,6 +100,7 @@ public class UserControllerTests
             Forename = "John",
             Surname = "Doe",
             Email = "test@email.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = true
         };
         controller.ModelState.AddModelError("Forename", "Required");
@@ -121,6 +124,7 @@ public class UserControllerTests
             Forename = "John",
             Surname = "Doe",
             Email = "test@email.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = true
         };
 
@@ -142,6 +146,7 @@ public class UserControllerTests
             Forename = "John",
             Surname = "Doe",
             Email = "test@email.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = true
         };
 
@@ -188,6 +193,7 @@ public class UserControllerTests
             Forename = "John",
             Surname = "Doe",
             Email = "test@email.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = true,
             Id = 1
         };
@@ -197,6 +203,7 @@ public class UserControllerTests
             Forename = "John",
             Surname = "Doe",
             Email = "test@email.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = true
         };
         _userService
@@ -226,6 +233,7 @@ public class UserControllerTests
             Forename = "John",
             Surname = "Doe",
             Email = "test@email.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = true,
             Id = 1
         };
@@ -253,6 +261,7 @@ public class UserControllerTests
             Forename = "John",
             Surname = "Doe",
             Email = "test@email.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = true,
             Id = 1
         };
@@ -270,7 +279,7 @@ public class UserControllerTests
     }
 
 
-    private User[] SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true)
+    private User[] SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true, DateTime dateOfBirth = default)
     {
         var users = new[]
         {
@@ -279,7 +288,8 @@ public class UserControllerTests
                 Forename = forename,
                 Surname = surname,
                 Email = email,
-                IsActive = isActive
+                IsActive = isActive,
+                DateOfBirth = dateOfBirth
             }
         };
 
