@@ -306,9 +306,9 @@ public class UserServiceTests
         };
 
         // Act: Invokes the method under test with the arranged parameters.
-        service.Update(userToDelete);
+        service.Delete(userToDelete);
 
-        // Assert: Verifies that the action of the method under test behaves as expected.
+        // Assert: Verifies that the action o`f the method under test behaves as expected.
         _dataContext.Verify(s => s.Create(It.Is<Log>(l =>
             l.Type == logToCreate.Type &&
             l.Description == logToCreate.Description &&
