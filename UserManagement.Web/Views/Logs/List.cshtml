@@ -1,0 +1,43 @@
+@model UserManagement.Web.Models.Logs.LogListViewModel
+
+<h2>User List</h2>
+
+<input type="text" id="logSearch" class="form-control mb-3" placeholder="Search logs..." />
+
+<div class="table-responsive">
+    <table class="table table-striped" id="logsTable">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>UserId</th>
+                <th>Type</th>
+                <th>Created At</th>
+                <th style="width: 1px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items.OrderByDescending(x => x.CreatedAt))
+            {
+                <tr onclick="window.location='/logs/@item.Id';" style="cursor: pointer;">
+                    <td>@item.Id</td>
+                    <td>@item.UserId</td>
+                    <td>@item.Type</td>
+                    <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('logSearch').addEventListener('keyup', function () {
+            var search = this.value.toLowerCase();
+            var rows = document.querySelectorAll('#logsTable tbody tr');
+            rows.forEach(function (row) {
+                var text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        });
+    </script>
+}
