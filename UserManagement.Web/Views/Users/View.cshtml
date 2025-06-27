@@ -1,8 +1,31 @@
 @model UserManagement.Web.Models.Users.UserListItemViewModel
 
+
 <h2>@Model.Forename @Model.Surname</h2>
 <p>Id: @Model.Id</p>
 <p>Email: @Model.Email</p>
+<p>Date of Birth: @(Model.DateOfBirth == default(DateTime) ? "-" : Model.DateOfBirth.ToString("dd/MM/yyyy"))</p>
 <p>Active: @(Model.IsActive ? "Yes" : "No")</p>
 
+<p>Logs</p>
+<div id="user-logs">
+    <p>Loading logs...</p>
+</div>
+
 <a href="/users">Back</a>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var userId = @Model.Id;
+            fetch('/logs/user/' + userId)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('user-logs').innerHTML = html;
+                })
+                .catch(() => {
+                    document.getElementById('user-logs').innerHTML = "<p>Could not load logs.</p>";
+                });
+        });
+    </script>
+}

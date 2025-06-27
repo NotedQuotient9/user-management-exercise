@@ -25,7 +25,8 @@ public class UsersController : Controller
             Forename = p.Forename,
             Surname = p.Surname,
             Email = p.Email,
-            IsActive = p.IsActive
+            IsActive = p.IsActive,
+            DateOfBirth = p.DateOfBirth
         });
 
         var model = new UserListViewModel
@@ -60,7 +61,8 @@ public class UsersController : Controller
             Forename = model.Forename,
             Surname = model.Surname,
             Email = model.Email,
-            IsActive = model.IsActive
+            IsActive = model.IsActive,
+            DateOfBirth = model.DateOfBirth
         };
         _userService.Create(user);
         return RedirectToAction("List");
@@ -83,7 +85,8 @@ public class UsersController : Controller
             Forename = user.Forename,
             Surname = user.Surname,
             Email = user.Email,
-            IsActive = user.IsActive
+            IsActive = user.IsActive,
+            DateOfBirth = user.DateOfBirth
         };
 
         return View(model);
@@ -104,7 +107,8 @@ public class UsersController : Controller
             Forename = user.Forename,
             Surname = user.Surname,
             Email = user.Email,
-            IsActive = user.IsActive
+            IsActive = user.IsActive,
+            DateOfBirth = user.DateOfBirth
         };
         return View(model);
     }
@@ -127,6 +131,7 @@ public class UsersController : Controller
         user.Surname = model.Surname;
         user.Email = model.Email;
         user.IsActive = model.IsActive;
+        user.DateOfBirth = model.DateOfBirth;
 
         _userService.Update(user);
 

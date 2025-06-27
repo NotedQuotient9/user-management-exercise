@@ -28,6 +28,7 @@ public class DataContext : DbContext, IDataContext
         });
 
     public DbSet<User>? Users { get; set; }
+    public DbSet<Log>? Logs { get; set; }
 
     public IQueryable<TEntity> GetAll<TEntity>() where TEntity : class
         => base.Set<TEntity>();
@@ -37,10 +38,11 @@ public class DataContext : DbContext, IDataContext
         return base.Set<TEntity>().Find(id);
     }
 
-    public void Create<TEntity>(TEntity entity) where TEntity : class
+    public TEntity Create<TEntity>(TEntity entity) where TEntity : class
     {
         base.Add(entity);
         SaveChanges();
+        return entity;
     }
 
     public new void Update<TEntity>(TEntity entity) where TEntity : class

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Implementations;
@@ -30,6 +31,7 @@ public class UserServiceTests
             Forename = "Johnny",
             Surname = "User",
             Email = "juser@example.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = true
         };
         var inactiveUser = new User
@@ -37,6 +39,7 @@ public class UserServiceTests
             Forename = "Jane",
             Surname = "User",
             Email = "test@email.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = false
         };
         var users = new[] { activeUser, inactiveUser }.AsQueryable();
@@ -62,6 +65,7 @@ public class UserServiceTests
             Forename = "Johnny",
             Surname = "User",
             Email = "juser@example.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = true
         };
         var inactiveUser = new User
@@ -69,6 +73,7 @@ public class UserServiceTests
             Forename = "Jane",
             Surname = "User",
             Email = "test@email.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = false
         };
         var users = new[] { activeUser, inactiveUser }.AsQueryable();
@@ -94,8 +99,13 @@ public class UserServiceTests
             Forename = "Johnny",
             Surname = "User",
             Email = "juser@example.com",
-            IsActive = true
+            DateOfBirth = new DateTime(1990, 1, 1),
+            IsActive = true,
+            Id = 1
         };
+        _dataContext
+            .Setup(s => s.Create<User>(It.IsAny<User>()))
+            .Returns(userToCreate);
 
         // Act: Invokes the method under test with the arranged parameters.
         service.Create(userToCreate);
@@ -118,6 +128,7 @@ public class UserServiceTests
             Forename = "Johnny",
             Surname = "User",
             Email = "juser@example.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
             IsActive = true
         };
         _dataContext
@@ -147,26 +158,6 @@ public class UserServiceTests
         // Assert: Verifies that the action of the method under test behaves as expected.
         result.Should().BeNull();
 
-    }
-
-    private IQueryable<User> SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true)
-    {
-        var users = new[]
-        {
-            new User
-            {
-                Forename = forename,
-                Surname = surname,
-                Email = email,
-                IsActive = isActive
-            }
-        }.AsQueryable();
-
-        _dataContext
-            .Setup(s => s.GetAll<User>())
-            .Returns(users);
-
-        return users;
     }
 
     [Fact]
@@ -219,6 +210,132 @@ public class UserServiceTests
             u.Email == userToDelete.Email &&
             u.IsActive == userToDelete.IsActive &&
             u.Id == userToDelete.Id)), Times.Once);
+    }
+
+    [Fact]
+    public void Create_WhenCreateCalled_ShouldLogAction()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var service = CreateService();
+        var userToCreate = new User
+        {
+            Forename = "Johnny",
+            Surname = "User",
+            Email = "juser@example.com",
+            DateOfBirth = new DateTime(1990, 1, 1),
+            IsActive = true,
+            Id = 1
+        };
+        var logToCreate = new Log
+        {
+            Type = LogType.Created,
+            Description = "User: 1 created; Forname: Johnny, Surname: User, Email: juser@example.com, IsActive: True, DateOfBirth: 01/01/1990",
+            CreatedAt = DateTime.UtcNow,
+            UserId = userToCreate.Id
+        };
+        _dataContext
+            .Setup(s => s.Create<User>(It.IsAny<User>()))
+            .Returns(userToCreate);
+
+        // Act: Invokes the method under test with the arranged parameters.
+        service.Create(userToCreate);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        _dataContext.Verify(s => s.Create(It.Is<Log>(l =>
+            l.Type == logToCreate.Type &&
+            l.Description == logToCreate.Description &&
+            l.CreatedAt != default &&
+            l.Id == 0 &&
+            l.UserId == logToCreate.UserId)), Times.Once);
+    }
+
+    [Fact]
+    public void Update_WhenUpdateCalled_ShouldLogAction()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var service = CreateService();
+        var userToUpdate = new User
+        {
+            Forename = "Johnny",
+            Surname = "User",
+            Email = "juser@example.com",
+            IsActive = true,
+            DateOfBirth = new DateTime(1990, 1, 1),
+            Id = 1
+        };
+        var logToCreate = new Log
+        {
+            Type = LogType.Updated,
+            Description = "User: 1 updated; Forname: Johnny, Surname: User, Email: juser@example.com, IsActive: True, DateOfBirth: 01/01/1990",
+            CreatedAt = DateTime.UtcNow,
+            UserId = userToUpdate.Id
+        };
+
+        // Act: Invokes the method under test with the arranged parameters.
+        service.Update(userToUpdate);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        _dataContext.Verify(s => s.Create(It.Is<Log>(l =>
+            l.Type == logToCreate.Type &&
+            l.Description == logToCreate.Description &&
+            l.CreatedAt != default &&
+            l.Id == 0 &&
+            l.UserId == logToCreate.UserId)), Times.Once);
+    }
+
+    [Fact]
+    public void Delete_WhenDeleteCalled_ShouldLogAction()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var service = CreateService();
+        var userToDelete = new User
+        {
+            Forename = "Johnny",
+            Surname = "User",
+            Email = "juser@example.com",
+            IsActive = true,
+            DateOfBirth = new DateTime(1990, 1, 1),
+            Id = 1
+        };
+        var logToCreate = new Log
+        {
+            Type = LogType.Deleted,
+            Description = "User: 1 deleted; Forname: Johnny, Surname: User, Email: juser@example.com, IsActive: True, DateOfBirth: 01/01/1990",
+            CreatedAt = DateTime.UtcNow,
+            UserId = userToDelete.Id
+        };
+
+        // Act: Invokes the method under test with the arranged parameters.
+        service.Update(userToDelete);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        _dataContext.Verify(s => s.Create(It.Is<Log>(l =>
+            l.Type == logToCreate.Type &&
+            l.Description == logToCreate.Description &&
+            l.CreatedAt != default &&
+            l.Id == 0 &&
+            l.UserId == logToCreate.UserId)), Times.Once);
+    }
+
+    private IQueryable<User> SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true, DateTime dateofBirth = default)
+    {
+        var users = new[]
+        {
+            new User
+            {
+                Forename = forename,
+                Surname = surname,
+                Email = email,
+                IsActive = isActive,
+                DateOfBirth = dateofBirth
+            }
+        }.AsQueryable();
+
+        _dataContext
+            .Setup(s => s.GetAll<User>())
+            .Returns(users);
+
+        return users;
     }
 
     private readonly Mock<IDataContext> _dataContext = new();

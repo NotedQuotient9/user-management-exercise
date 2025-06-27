@@ -1,0 +1,9 @@
+@model UserManagement.Web.Models.Logs.LogListItemViewModel
+
+<p>Id: @Model.Id</p>
+<p>User Id: @Model.UserId</p>
+<p>Type: @Model.Type</p>
+<p>Created At: @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")</p>
+<p>Description: @Model.Description</p>
+
+<a href="/users/@Model.UserId"> Back </a>
