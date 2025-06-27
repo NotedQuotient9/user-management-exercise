@@ -1,0 +1,28 @@
+@model UserManagement.Web.Models.Logs.LogListViewModel
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Created At</th>
+                <th style="width: 1px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr onclick="window.location='/logs/@item.Id';" style="cursor: pointer;">
+                    <a href="/logs/@item.Id">
+                        <td>
+                            @item.Type
+                        </td>
+                        <td>
+                            @item.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")
+                        </td>
+                    </a>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

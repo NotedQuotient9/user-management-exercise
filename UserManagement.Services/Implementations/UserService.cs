@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UserManagement.Data;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
+using System;
 
 namespace UserManagement.Services.Domain.Implementations;
 
@@ -18,9 +19,32 @@ public class UserService : IUserService
 
     public IEnumerable<User> GetAll() => _dataAccess.GetAll<User>();
 
-    public void Create(User user) => _dataAccess.Create(user);
+    public void Create(User user)
+    {
+        user = _dataAccess.Create(user);
+        Console.WriteLine(user.Id);
+        var log = new Log
+        {
+            Type = LogType.Created,
+            Description = $"User: {user.Id} created; Forname: {user.Forename}, Surname: {user.Surname}, Email: {user.Email}, IsActive: {user.IsActive}, DateOfBirth: {user.DateOfBirth:dd/MM/yyyy}",
+            CreatedAt = DateTime.UtcNow,
+            UserId = user.Id
+        };
+        _dataAccess.Create(log);
+    }
 
     public User? GetById(long id) => _dataAccess.GetById<User>(id);
 
-    public void Update(User user) => _dataAccess.Update(user);
+    public void Update(User user)
+    {
+        _dataAccess.Update(user);
+        var log = new Log
+        {
+            Type = LogType.Updated,
+            Description = $"User: {user.Id} updated; Forname: {user.Forename}, Surname: {user.Surname}, Email: {user.Email}, IsActive: {user.IsActive}, DateOfBirth: {user.DateOfBirth:dd/MM/yyyy}",
+            CreatedAt = DateTime.UtcNow,
+            UserId = user.Id
+        };
+        _dataAccess.Create(log);
+    }
 }
