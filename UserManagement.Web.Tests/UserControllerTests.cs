@@ -278,6 +278,35 @@ public class UserControllerTests
             .Which.ViewName.Should().Be("Error");
     }
 
+    [Fact]
+    public void Delete_WhenUserExists_CallsServiceToDeleteUser()
+    {
+        // Arrange
+        var controller = CreateController();
+        SetupUsers();
+        var user = new User
+        {
+            Id = 1,
+            Forename = "John",
+            Surname = "Doe",
+            Email = "test@email.com",
+            IsActive = true
+        };
+        _userService
+            .Setup(s => s.GetById(1))
+            .Returns(user);
+
+        // Act
+        controller.Delete(1);
+
+        // Assert
+        _userService.Verify(s => s.Delete(It.Is<User>(u =>
+            u.Forename == user.Forename &&
+            u.Surname == user.Surname &&
+            u.Email == user.Email &&
+            u.IsActive == user.IsActive &&
+            u.Id == user.Id)), Times.Once);
+    }
 
     private User[] SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true, DateTime dateOfBirth = default)
     {

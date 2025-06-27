@@ -187,6 +187,32 @@ public class UserServiceTests
     }
 
     [Fact]
+    public void Delete_WhenDeleteCalled_ShouldUseUserDetails()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var service = CreateService();
+        var userToDelete = new User
+        {
+            Forename = "Johnny",
+            Surname = "User",
+            Email = "juser@example.com",
+            IsActive = true,
+            Id = 1
+        };
+
+        // Act: Invokes the method under test with the arranged parameters.
+        service.Delete(userToDelete);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        _dataContext.Verify(s => s.Delete(It.Is<User>(u =>
+            u.Forename == userToDelete.Forename &&
+            u.Surname == userToDelete.Surname &&
+            u.Email == userToDelete.Email &&
+            u.IsActive == userToDelete.IsActive &&
+            u.Id == userToDelete.Id)), Times.Once);
+    }
+
+    [Fact]
     public void Create_WhenCreateCalled_ShouldLogAction()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
@@ -249,6 +275,40 @@ public class UserServiceTests
         service.Update(userToUpdate);
 
         // Assert: Verifies that the action of the method under test behaves as expected.
+        _dataContext.Verify(s => s.Create(It.Is<Log>(l =>
+            l.Type == logToCreate.Type &&
+            l.Description == logToCreate.Description &&
+            l.CreatedAt != default &&
+            l.Id == 0 &&
+            l.UserId == logToCreate.UserId)), Times.Once);
+    }
+
+    [Fact]
+    public void Delete_WhenDeleteCalled_ShouldLogAction()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var service = CreateService();
+        var userToDelete = new User
+        {
+            Forename = "Johnny",
+            Surname = "User",
+            Email = "juser@example.com",
+            IsActive = true,
+            DateOfBirth = new DateTime(1990, 1, 1),
+            Id = 1
+        };
+        var logToCreate = new Log
+        {
+            Type = LogType.Deleted,
+            Description = "User: 1 deleted; Forname: Johnny, Surname: User, Email: juser@example.com, IsActive: True, DateOfBirth: 01/01/1990",
+            CreatedAt = DateTime.UtcNow,
+            UserId = userToDelete.Id
+        };
+
+        // Act: Invokes the method under test with the arranged parameters.
+        service.Delete(userToDelete);
+
+        // Assert: Verifies that the action o`f the method under test behaves as expected.
         _dataContext.Verify(s => s.Create(It.Is<Log>(l =>
             l.Type == logToCreate.Type &&
             l.Description == logToCreate.Description &&

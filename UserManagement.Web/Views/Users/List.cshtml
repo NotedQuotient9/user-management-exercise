@@ -46,7 +46,14 @@
                             <ul class="dropdown-menu" aria-labelledby="btnToggleActions">
                                 <li><a class="dropdown-item" href="/users/@item.Id">View</a></li>
                                 <li><a class="dropdown-item" href="/users/edit/@item.Id">Edit</a></li>
-                                <li><a class="dropdown-item" href="#">Delete</a></li>
+                                <li>
+                                    <form method="post" action="/users/delete/@item.Id" style="display:inline;">
+                                        <button type="submit" class="dropdown-item"
+                                            style="background:red;color:white;border:none;padding-left:15px;margin:0;">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </li>
                             </ul>
                         </div>
                     </td>

@@ -47,4 +47,17 @@ public class UserService : IUserService
         };
         _dataAccess.Create(log);
     }
+
+    public void Delete(User user)
+    {
+        _dataAccess.Delete<User>(user);
+        var log = new Log
+        {
+            Type = LogType.Deleted,
+            Description = $"User: {user.Id} deleted; Forname: {user.Forename}, Surname: {user.Surname}, Email: {user.Email}, IsActive: {user.IsActive}, DateOfBirth: {user.DateOfBirth:dd/MM/yyyy}",
+            CreatedAt = DateTime.UtcNow,
+            UserId = user.Id
+        };
+        _dataAccess.Create(log);
+    }
 }

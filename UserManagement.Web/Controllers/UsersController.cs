@@ -137,4 +137,17 @@ public class UsersController : Controller
 
         return RedirectToAction("List");
     }
+
+    [HttpPost("delete/{id:long}")]
+    public IActionResult Delete(long id)
+    {
+        var user = _userService.GetById(id);
+        if (user == null)
+        {
+            return View("Error");
+        }
+
+        _userService.Delete(user);
+        return RedirectToAction("List");
+    }
 }
