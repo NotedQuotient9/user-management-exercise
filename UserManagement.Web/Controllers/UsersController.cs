@@ -57,6 +57,12 @@ public class UsersController : Controller
             ModelState.AddModelError("Email", "Email already exists.");
             return View(model);
         }
+        var emailAttribute = new System.ComponentModel.DataAnnotations.EmailAddressAttribute();
+        if (!emailAttribute.IsValid(model.Email))
+        {
+            ModelState.AddModelError("Email", "Email format is invalid.");
+            return View(model);
+        }
 
         var user = new User
         {

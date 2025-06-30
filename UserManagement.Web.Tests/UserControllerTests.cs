@@ -138,6 +138,28 @@ public class UserControllerTests
     }
 
     [Fact]
+    public async Task Create_WhenEmailIsInvalid_DoesNotCallServiceToCreateUser()
+    {
+        // Arrange
+        var controller = CreateController();
+
+        var model = new UserCreateViewModel
+        {
+            Forename = "John",
+            Surname = "Doe",
+            Email = "test",
+            DateOfBirth = new DateTime(1990, 1, 1),
+            IsActive = true
+        };
+
+        // Act
+        await controller.Create(model);
+
+        // Assert
+        _userService.Verify(s => s.Create(It.IsAny<User>()), Times.Never);
+    }
+
+    [Fact]
     public async Task View_WhenServiceReturnsUser_ModelMustContainUser()
     {
         // Arrange
