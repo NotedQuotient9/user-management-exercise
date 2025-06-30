@@ -1,3 +1,19 @@
+# Notes on changes made
+
+As part of the exercise the following changes have been made:
+* Is Active & Non Active filter implemented
+* Add user feature implemented
+* View user feature implemented
+* Edit user feature implemented
+* Delete user feature implemented
+* Date of birth field added for users
+* Logging added, including ability to view all logs, individual logs, an dlogs per user
+* basic ability to filter logs on logs page added
+* project converted to async
+* Github actions CI pipeline created
+
+This work was split into PRs which can be viewed in the Pull requests tab
+
 # User Management Technical Exercise
 
 The exercise is an ASP.NET Core web application backed by Entity Framework Core, which faciliates management of some fictional users.
