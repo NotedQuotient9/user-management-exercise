@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UserManagement.Models;
 
 namespace UserManagement.Services.Domain.Interfaces;
@@ -6,8 +7,8 @@ namespace UserManagement.Services.Domain.Interfaces;
 public interface ILogService
 {
 
-    IEnumerable<Log> GetByUserId(long userId);
-    IEnumerable<Log> GetAll();
-    Log? GetById(long id);
+    Task<IEnumerable<Log>> GetByUserId(long userId);
+    Task<IEnumerable<Log>> GetAll();
+    Task<Log?> GetById(long id);
 
 }

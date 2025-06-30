@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using UserManagement.Models;
 
@@ -30,30 +31,30 @@ public class DataContext : DbContext, IDataContext
     public DbSet<User>? Users { get; set; }
     public DbSet<Log>? Logs { get; set; }
 
-    public IQueryable<TEntity> GetAll<TEntity>() where TEntity : class
-        => base.Set<TEntity>();
+    public async Task<List<TEntity>> GetAll<TEntity>() where TEntity : class
+        => await base.Set<TEntity>().ToListAsync();
 
-    public TEntity? GetById<TEntity>(long id) where TEntity : class
+    public async Task<TEntity?> GetById<TEntity>(long id) where TEntity : class
     {
-        return base.Set<TEntity>().Find(id);
+        return await base.Set<TEntity>().FindAsync(id);
     }
 
-    public TEntity Create<TEntity>(TEntity entity) where TEntity : class
+    public async Task<TEntity> Create<TEntity>(TEntity entity) where TEntity : class
     {
         base.Add(entity);
-        SaveChanges();
+        await SaveChangesAsync();
         return entity;
     }
 
-    public new void Update<TEntity>(TEntity entity) where TEntity : class
+    public new async void Update<TEntity>(TEntity entity) where TEntity : class
     {
         base.Update(entity);
-        SaveChanges();
+        await SaveChangesAsync();
     }
 
-    public void Delete<TEntity>(TEntity entity) where TEntity : class
+    public async void Delete<TEntity>(TEntity entity) where TEntity : class
     {
         base.Remove(entity);
-        SaveChanges();
+        await SaveChangesAsync();
     }
 }

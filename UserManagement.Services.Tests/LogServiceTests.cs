@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Implementations;
 
@@ -8,35 +9,35 @@ namespace UserManagement.Data.Tests;
 public class LogServiceTests
 {
     [Fact]
-    public void GetAll_WhenContextReturnsEntities_MustReturnSameEntities()
+    public async Task GetAll_WhenContextReturnsEntities_MustReturnSameEntities()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         var service = CreateService();
         var logs = SetupLogs();
 
         // Act: Invokes the method under test with the arranged parameters.
-        var result = service.GetAll();
+        var result = await service.GetAll();
 
         // Assert: Verifies that the action of the method under test behaves as expected.
-        result.Should().BeSameAs(logs);
+        result.Should().BeEquivalentTo(logs);
     }
 
     [Fact]
-    public void GetByUserId_WhenContextReturnsEntities_MustByFilteredByUserId()
+    public async Task GetByUserId_WhenContextReturnsEntities_MustByFilteredByUserId()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         var service = CreateService();
         SetupLogs();
 
         // Act: Invokes the method under test with the arranged parameters.
-        var result = service.GetByUserId(1);
+        var result = await service.GetByUserId(1);
 
         // Assert: Verifies that the action of the method under test behaves as expected.
         result.Should().HaveCount(2).And.OnlyContain(log => log.UserId == 1);
     }
 
     [Fact]
-    public void GetById_WhenContextReturnsEntities_MustReturnOnlyIndividualLog()
+    public async Task GetById_WhenContextReturnsEntities_MustReturnOnlyIndividualLog()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         var service = CreateService();
@@ -52,13 +53,13 @@ public class LogServiceTests
         };
         _dataContext
             .Setup(s => s.GetById<Log>(3))
-            .Returns(log);
+            .Returns(Task.FromResult<Log?>(log));
 
         // Act: Invokes the method under test with the arranged parameters.
-        var result = service.GetById(3);
+        var result = await service.GetById(3);
 
         // Assert: Verifies that the action of the method under test behaves as expected.
-        result.Should().BeSameAs(log);
+        result.Should().BeEquivalentTo(log);
     }
 
     private IQueryable<Log> SetupLogs()
@@ -93,7 +94,7 @@ public class LogServiceTests
 
         _dataContext
             .Setup(s => s.GetAll<Log>())
-                .Returns(logs);
+                .Returns(Task.FromResult(logs.ToList()));
 
         return logs;
     }

@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using UserManagement.Models;
 
 namespace UserManagement.Data.Tests;
@@ -6,7 +7,7 @@ namespace UserManagement.Data.Tests;
 public class DataContextTests
 {
     [Fact]
-    public void GetAll_WhenNewEntityAdded_MustIncludeNewEntity()
+    public async Task GetAll_WhenNewEntityAdded_MustIncludeNewEntity()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         var context = CreateContext();
@@ -17,10 +18,10 @@ public class DataContextTests
             Surname = "User",
             Email = "brandnewuser@example.com"
         };
-        context.Create(entity);
+        await context.Create(entity);
 
         // Act: Invokes the method under test with the arranged parameters.
-        var result = context.GetAll<User>();
+        var result = await context.GetAll<User>();
 
         // Assert: Verifies that the action of the method under test behaves as expected.
         result
@@ -29,57 +30,60 @@ public class DataContextTests
     }
 
     [Fact]
-    public void GetAll_WhenDeleted_MustNotIncludeDeletedEntity()
+    public async Task GetAll_WhenDeleted_MustNotIncludeDeletedEntity()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         var context = CreateContext();
-        var entity = context.GetAll<User>().First();
+        var entities = await context.GetAll<User>();
+        var entity = entities.First();
         context.Delete(entity);
 
         // Act: Invokes the method under test with the arranged parameters.
-        var result = context.GetAll<User>();
+        var result = await context.GetAll<User>();
 
         // Assert: Verifies that the action of the method under test behaves as expected.
         result.Should().NotContain(s => s.Email == entity.Email);
     }
 
     [Fact]
-    public void GetAll_WhenFilteredByIsActive_MustOnlyReturnActiveUsers()
+    public async Task GetAll_WhenFilteredByIsActive_MustOnlyReturnActiveUsers()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         var context = CreateContext();
 
         // Act: Invokes the method under test with the arranged parameters.
-        var result = context.GetAll<User>().Where(u => u.IsActive == true);
+        var results = await context.GetAll<User>();
+        var result = results.Where(u => u.IsActive == true);
 
         // Assert: Verifies that the action of the method under test behaves as expected.
         result.All(u => u.IsActive).Should().BeTrue();
     }
 
     [Fact]
-    public void GetAll_WhenFilteredByIsActive_MustOnlyReturnInactiveUsers()
+    public async void GetAll_WhenFilteredByIsActive_MustOnlyReturnInactiveUsers()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         var context = CreateContext();
 
 
         // Act: Invokes the method under test with the arranged parameters.
-        var result = context.GetAll<User>().Where(u => u.IsActive == false);
+        var results = await context.GetAll<User>();
+        var result = results.Where(u => u.IsActive == false);
 
         // Assert: Verifies that the action of the method under test behaves as expected.
         result.All(u => u.IsActive).Should().BeFalse();
     }
 
     [Fact]
-    public void GetById_WhenUserExists_ShouldReturnUser()
+    public async Task GetById_WhenUserExists_ShouldReturnUser()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         var context = CreateContext();
         var expected = new User { Id = 1000, Forename = "New", Surname = "User", Email = "newUser@example.com", IsActive = true };
-        context.Create(expected);
+        await context.Create(expected);
 
         // Act: Invokes the method under test with the arranged parameters.
-        var result = context.GetById<User>(1000);
+        var result = await context.GetById<User>(1000);
 
         // Assert: Verifies that the action of the method under test behaves as expected.
         result
@@ -87,13 +91,13 @@ public class DataContextTests
     }
 
     [Fact]
-    public void GetById_WhenUserDoesNotExist_ShouldReturnNull()
+    public async Task GetById_WhenUserDoesNotExist_ShouldReturnNull()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         var context = CreateContext();
 
         // Act: Invokes the method under test with the arranged parameters.
-        var result = context.GetById<User>(100);
+        var result = await context.GetById<User>(100);
 
         // Assert: Verifies that the action of the method under test behaves as expected.
         result
