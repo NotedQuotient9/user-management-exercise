@@ -4,6 +4,7 @@ using UserManagement.Data;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace UserManagement.Services.Domain.Implementations;
 
@@ -12,16 +13,17 @@ public class UserService : IUserService
     private readonly IDataContext _dataAccess;
     public UserService(IDataContext dataAccess) => _dataAccess = dataAccess;
 
-    public IEnumerable<User> FilterByActive(bool isActive)
+    public async Task<IEnumerable<User>> FilterByActive(bool isActive)
     {
-        return _dataAccess.GetAll<User>().Where(u => u.IsActive == isActive);
+        var users = await _dataAccess.GetAll<User>();
+        return users.Where(u => u.IsActive == isActive);
     }
 
-    public IEnumerable<User> GetAll() => _dataAccess.GetAll<User>();
+    public async Task<IEnumerable<User>> GetAll() => await _dataAccess.GetAll<User>();
 
-    public void Create(User user)
+    public async void Create(User user)
     {
-        user = _dataAccess.Create(user);
+        user = await _dataAccess.Create(user);
         Console.WriteLine(user.Id);
         var log = new Log
         {
@@ -30,12 +32,12 @@ public class UserService : IUserService
             CreatedAt = DateTime.UtcNow,
             UserId = user.Id
         };
-        _dataAccess.Create(log);
+        await _dataAccess.Create(log);
     }
 
-    public User? GetById(long id) => _dataAccess.GetById<User>(id);
+    public async Task<User?> GetById(long id) => await _dataAccess.GetById<User>(id);
 
-    public void Update(User user)
+    public async void Update(User user)
     {
         _dataAccess.Update(user);
         var log = new Log
@@ -45,10 +47,10 @@ public class UserService : IUserService
             CreatedAt = DateTime.UtcNow,
             UserId = user.Id
         };
-        _dataAccess.Create(log);
+        await _dataAccess.Create(log);
     }
 
-    public void Delete(User user)
+    public async void Delete(User user)
     {
         _dataAccess.Delete<User>(user);
         var log = new Log
@@ -58,6 +60,6 @@ public class UserService : IUserService
             CreatedAt = DateTime.UtcNow,
             UserId = user.Id
         };
-        _dataAccess.Create(log);
+        await _dataAccess.Create(log);
     }
 }

@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using UserManagement.Services.Domain.Interfaces;
 using UserManagement.Web.Models.Logs;
 
@@ -11,9 +12,9 @@ public class LogsController : Controller
     public LogsController(ILogService logService) => _logService = logService;
 
     [HttpGet]
-    public ViewResult List()
+    public async Task<ViewResult> List()
     {
-        var logs = _logService.GetAll();
+        var logs = await _logService.GetAll();
         var items = logs.Select(p => new LogListItemViewModel
         {
             Id = p.Id,
@@ -33,10 +34,10 @@ public class LogsController : Controller
 
 
     [HttpGet("{id:long}")]
-    public ViewResult View(long id)
+    public async Task<ViewResult> View(long id)
     {
 
-        var log = _logService.GetById(id);
+        var log = await _logService.GetById(id);
 
         if (log == null)
         {
@@ -56,9 +57,9 @@ public class LogsController : Controller
     }
 
     [HttpGet("user/{userId:long}")]
-    public PartialViewResult UserLogs(long userId)
+    public async Task<PartialViewResult> UserLogs(long userId)
     {
-        var logs = _logService.GetByUserId(userId);
+        var logs = await _logService.GetByUserId(userId);
         var items = logs.Select(p => new LogListItemViewModel
         {
             Id = p.Id,

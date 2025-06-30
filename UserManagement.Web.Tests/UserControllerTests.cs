@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
@@ -10,14 +12,14 @@ namespace UserManagement.Data.Tests;
 public class UserControllerTests
 {
     [Fact]
-    public void List_WhenServiceReturnsUsers_ModelMustContainUsers()
+    public async Task List_WhenServiceReturnsUsers_ModelMustContainUsers()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         var controller = CreateController();
         var users = SetupUsers();
 
         // Act: Invokes the method under test with the arranged parameters.
-        var result = controller.List(null);
+        var result = await controller.List(null);
 
         // Assert: Verifies that the action of the method under test behaves as expected.
         result.Model
@@ -26,7 +28,7 @@ public class UserControllerTests
     }
 
     [Fact]
-    public void List_WhenServiceReturnsUsersWithIsActiveTrue_ModelMustContainOnlyActiveUsers()
+    public async Task List_WhenServiceReturnsUsersWithIsActiveTrue_ModelMustContainOnlyActiveUsers()
     {
         // Arrange
         var controller = CreateController();
@@ -34,10 +36,10 @@ public class UserControllerTests
 
         _userService
             .Setup(s => s.FilterByActive(true))
-            .Returns(users);
+            .Returns(Task.FromResult(users.AsEnumerable()));
 
         // Act
-        var result = controller.List(true);
+        var result = await controller.List(true);
 
         // Assert
         result.Model
@@ -46,7 +48,7 @@ public class UserControllerTests
     }
 
     [Fact]
-    public void List_WhenServiceReturnsUsersWithIsActiveFalse_ModelMustContainOnlyInactiveUsers()
+    public async Task List_WhenServiceReturnsUsersWithIsActiveFalse_ModelMustContainOnlyInactiveUsers()
     {
         // Arrange
         var controller = CreateController();
@@ -54,10 +56,10 @@ public class UserControllerTests
 
         _userService
             .Setup(s => s.FilterByActive(false))
-            .Returns(users);
+            .Returns(Task.FromResult(users.AsEnumerable()));
 
         // Act
-        var result = controller.List(false);
+        var result = await controller.List(false);
 
         // Assert
         result.Model
@@ -66,7 +68,7 @@ public class UserControllerTests
     }
 
     [Fact]
-    public void Create_WhenModelStateIsValid_CallsServiceToCreateUser()
+    public async Task Create_WhenModelStateIsValid_CallsServiceToCreateUser()
     {
         // Arrange
         var controller = CreateController();
@@ -80,7 +82,7 @@ public class UserControllerTests
         };
 
         // Act
-        controller.Create(model);
+        await controller.Create(model);
 
         // Assert
         _userService.Verify(s => s.Create(It.Is<User>(u =>
@@ -91,7 +93,7 @@ public class UserControllerTests
     }
 
     [Fact]
-    public void Create_WhenModelStateIsInvalid_DoesNotCallServiceToCreateUser()
+    public async Task Create_WhenModelStateIsInvalid_DoesNotCallServiceToCreateUser()
     {
         // Arrange
         var controller = CreateController();
@@ -106,14 +108,14 @@ public class UserControllerTests
         controller.ModelState.AddModelError("Forename", "Required");
 
         // Act
-        controller.Create(model);
+        await controller.Create(model);
 
         // Assert
         _userService.Verify(s => s.Create(It.IsAny<User>()), Times.Never);
     }
 
     [Fact]
-    public void Create_WhenEmailIsTaken_DoesNotCallServiceToCreateUser()
+    public async Task Create_WhenEmailIsTaken_DoesNotCallServiceToCreateUser()
     {
         // Arrange
         var controller = CreateController();
@@ -129,14 +131,14 @@ public class UserControllerTests
         };
 
         // Act
-        controller.Create(model);
+        await controller.Create(model);
 
         // Assert
         _userService.Verify(s => s.Create(It.IsAny<User>()), Times.Never);
     }
 
     [Fact]
-    public void View_WhenServiceReturnsUser_ModelMustContainUser()
+    public async Task View_WhenServiceReturnsUser_ModelMustContainUser()
     {
         // Arrange
         var controller = CreateController();
@@ -152,10 +154,10 @@ public class UserControllerTests
 
         _userService
             .Setup(s => s.GetById(1))
-            .Returns(expected);
+            .Returns(Task.FromResult<User?>(expected));
 
         // Act
-        var result = controller.View(1);
+        var result = await controller.View(1);
 
         // Assert
         result.Model
@@ -164,17 +166,17 @@ public class UserControllerTests
     }
 
     [Fact]
-    public void View_WhenServiceReturnsNull_ShouldReturnErrorView()
+    public async Task View_WhenServiceReturnsNull_ShouldReturnErrorView()
     {
         // Arrange
         var controller = CreateController();
 
         _userService
             .Setup(s => s.GetById(1))
-            .Returns(value: null);
+            .Returns(Task.FromResult<User?>(null));
 
         // Act
-        var result = controller.View(1);
+        var result = await controller.View(1);
 
         // Assert
         result
@@ -183,7 +185,7 @@ public class UserControllerTests
     }
 
     [Fact]
-    public void Edit_WhenModelStateIsValid_CallsServiceToUpdateUser()
+    public async Task Edit_WhenModelStateIsValid_CallsServiceToUpdateUser()
     {
         // Arrange
         var controller = CreateController();
@@ -208,11 +210,11 @@ public class UserControllerTests
         };
         _userService
             .Setup(s => s.GetById(1))
-            .Returns(user);
+            .Returns(Task.FromResult<User?>(user));
 
 
         // Act
-        controller.Edit(1, model);
+        await controller.Edit(1, model);
 
         // Assert
         _userService.Verify(s => s.Update(It.Is<User>(u =>
@@ -224,7 +226,7 @@ public class UserControllerTests
     }
 
     [Fact]
-    public void Edit_WhenModelStateIsInvalid_DoesNotCallServiceToUpdateUser()
+    public async Task Edit_WhenModelStateIsInvalid_DoesNotCallServiceToUpdateUser()
     {
         // Arrange
         var controller = CreateController();
@@ -240,7 +242,7 @@ public class UserControllerTests
         controller.ModelState.AddModelError("Forename", "Required");
 
         // Act
-        controller.Edit(1, model);
+        await controller.Edit(1, model);
 
         // Assert
         _userService.Verify(s => s.Create(It.IsAny<User>()), Times.Never);
@@ -248,14 +250,14 @@ public class UserControllerTests
     }
 
     [Fact]
-    public void Edit_WhenServiceReturnsNull_ShouldReturnErrorView()
+    public async Task Edit_WhenServiceReturnsNull_ShouldReturnErrorView()
     {
 
         // Arrange
         var controller = CreateController();
         _userService
             .Setup(s => s.GetById(1))
-            .Returns(value: null);
+            .Returns(Task.FromResult<User?>(null));
         var model = new UserEditViewModel
         {
             Forename = "John",
@@ -267,10 +269,10 @@ public class UserControllerTests
         };
 
         // Act
-        controller.Edit(1, model);
+        await controller.Edit(1, model);
 
         // Act
-        var result = controller.View(1);
+        var result = await controller.View(1);
 
         // Assert
         result
@@ -279,7 +281,7 @@ public class UserControllerTests
     }
 
     [Fact]
-    public void Delete_WhenUserExists_CallsServiceToDeleteUser()
+    public async Task Delete_WhenUserExists_CallsServiceToDeleteUser()
     {
         // Arrange
         var controller = CreateController();
@@ -294,10 +296,10 @@ public class UserControllerTests
         };
         _userService
             .Setup(s => s.GetById(1))
-            .Returns(user);
+            .Returns(Task.FromResult<User?>(user));
 
         // Act
-        controller.Delete(1);
+        await controller.Delete(1);
 
         // Assert
         _userService.Verify(s => s.Delete(It.Is<User>(u =>
@@ -324,7 +326,7 @@ public class UserControllerTests
 
         _userService
             .Setup(s => s.GetAll())
-            .Returns(users);
+            .Returns(Task.FromResult(users.AsEnumerable()));
 
         return users;
     }

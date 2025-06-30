@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
 using UserManagement.Web.Models.Logs;
@@ -9,14 +11,14 @@ namespace UserManagement.Data.Tests;
 public class LogsControllerTests
 {
     [Fact]
-    public void List_WhenServiceReturnsLogs_ModelMustContainLogs()
+    public async Task List_WhenServiceReturnsLogs_ModelMustContainLogs()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         var controller = CreateController();
         var logs = SetupLogs();
 
         // Act: Invokes the method under test with the arranged parameters.
-        var result = controller.List();
+        var result = await controller.List();
 
         // Assert: Verifies that the action of the method under test behaves as expected.
         result.Model
@@ -25,7 +27,7 @@ public class LogsControllerTests
     }
 
     [Fact]
-    public void View_WhenServiceReturnsLog_ModelMustContainLog()
+    public async void View_WhenServiceReturnsLog_ModelMustContainLog()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         var controller = CreateController();
@@ -39,10 +41,10 @@ public class LogsControllerTests
         };
         _logService
             .Setup(s => s.GetById(1))
-            .Returns(expected);
+            .Returns(Task.FromResult<Log?>(expected));
 
         // Act: Invokes the method under test with the arranged parameters.
-        var result = controller.View(1);
+        var result = await controller.View(1);
 
         // Assert: Verifies that the action of the method under test behaves as expected.
         result.Model
@@ -51,7 +53,7 @@ public class LogsControllerTests
     }
 
     [Fact]
-    public void UserLogs_WhenServiceReturnsLogs_ModelMustContainLogsForUser()
+    public async void UserLogs_WhenServiceReturnsLogs_ModelMustContainLogsForUser()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         var controller = CreateController();
@@ -77,10 +79,10 @@ public class LogsControllerTests
 
         _logService
             .Setup(s => s.GetByUserId(1))
-                .Returns(logs);
+                .Returns(Task.FromResult<IEnumerable<Log>>(logs));
 
         // Act: Invokes the method under test with the arranged parameters.
-        var result = controller.UserLogs(1);
+        var result = await controller.UserLogs(1);
 
         // Assert: Verifies that the action of the method under test behaves as expected.
         result.Model
@@ -121,7 +123,7 @@ public class LogsControllerTests
 
         _logService
             .Setup(s => s.GetAll())
-            .Returns(logs);
+            .Returns(Task.FromResult<IEnumerable<Log>>(logs));
 
         return logs;
     }

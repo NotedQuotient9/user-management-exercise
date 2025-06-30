@@ -2,6 +2,7 @@
 using UserManagement.Services.Domain.Interfaces;
 using UserManagement.Web.Models.Users;
 using UserManagement.Models;
+using System.Threading.Tasks;
 
 namespace UserManagement.WebMS.Controllers;
 
@@ -12,12 +13,12 @@ public class UsersController : Controller
     public UsersController(IUserService userService) => _userService = userService;
 
     [HttpGet]
-    public ViewResult List(bool? isActive)
+    public async Task<ViewResult> List(bool? isActive)
     {
 
         var users = isActive.HasValue
-            ? _userService.FilterByActive(isActive.Value)
-            : _userService.GetAll();
+            ? await _userService.FilterByActive(isActive.Value)
+            : await _userService.GetAll();
 
         var items = users.Select(p => new UserListItemViewModel
         {
@@ -44,13 +45,14 @@ public class UsersController : Controller
     }
 
     [HttpPost("create")]
-    public IActionResult Create(UserCreateViewModel model)
+    public async Task<IActionResult> Create(UserCreateViewModel model)
     {
         if (!ModelState.IsValid)
         {
             return View(model);
         }
-        if (_userService.GetAll().Any(u => u.Email == model.Email))
+        var existingUsers = await _userService.GetAll();
+        if (existingUsers.Any(u => u.Email == model.Email))
         {
             ModelState.AddModelError("Email", "Email already exists.");
             return View(model);
@@ -69,10 +71,10 @@ public class UsersController : Controller
     }
 
     [HttpGet("{id:long}")]
-    public ViewResult View(long id)
+    public async Task<ViewResult> View(long id)
     {
 
-        var user = _userService.GetById(id);
+        var user = await _userService.GetById(id);
 
         if (user == null)
         {
@@ -93,9 +95,9 @@ public class UsersController : Controller
     }
 
     [HttpGet("edit/{id:long}")]
-    public IActionResult Edit(long id)
+    public async Task<IActionResult> Edit(long id)
     {
-        var user = _userService.GetById(id);
+        var user = await _userService.GetById(id);
         if (user == null)
         {
             return View("Error");
@@ -114,14 +116,14 @@ public class UsersController : Controller
     }
 
     [HttpPost("edit/{id:long}")]
-    public IActionResult Edit(long id, UserEditViewModel model)
+    public async Task<IActionResult> Edit(long id, UserEditViewModel model)
     {
         if (!ModelState.IsValid)
         {
             return View(model);
         }
 
-        var user = _userService.GetById(id);
+        var user = await _userService.GetById(id);
         if (user == null)
         {
             return View("Error");
@@ -139,9 +141,9 @@ public class UsersController : Controller
     }
 
     [HttpPost("delete/{id:long}")]
-    public IActionResult Delete(long id)
+    public async Task<IActionResult> Delete(long id)
     {
-        var user = _userService.GetById(id);
+        var user = await _userService.GetById(id);
         if (user == null)
         {
             return View("Error");
